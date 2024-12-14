@@ -167,24 +167,22 @@ public class BaseSignBlock extends BaseEntityBlock {
             return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
         if (level.isClientSide()) {
-            if (player.isCreative()) {
-                var entity = (SignBlockEntity) player.level().getBlockEntity(pos);
-                if (entity == null ||Items.WOODEN_AXE.equals(player.getItemInHand(InteractionHand.MAIN_HAND).getItem())) {
-                    return ItemInteractionResult.FAIL;
-                }
-                if (DirectionUtil.isParallel(hitResult.getDirection(), state.getValue(FACING))) {
-                    var rightMaster = entity.findMasterAt(false);
-                    if (rightMaster.getBlockState().getValue(FACING) == hitResult.getDirection()) {
-                        openEditor(rightMaster);
-                        return ItemInteractionResult.SUCCESS;
-                    }
-                    var leftMaster = entity.findMasterAt(true);
-                    if (leftMaster.getBlockState().getValue(FACING) == hitResult.getDirection()) {
-                        openEditor(leftMaster);
-                    }
-                }
-                return ItemInteractionResult.SUCCESS;
+            var entity = (SignBlockEntity) player.level().getBlockEntity(pos);
+            if (entity == null || Items.WOODEN_AXE.equals(player.getItemInHand(InteractionHand.MAIN_HAND).getItem())) {
+                return ItemInteractionResult.FAIL;
             }
+            if (DirectionUtil.isParallel(hitResult.getDirection(), state.getValue(FACING))) {
+                var rightMaster = entity.findMasterAt(false);
+                if (rightMaster.getBlockState().getValue(FACING) == hitResult.getDirection()) {
+                    openEditor(rightMaster);
+                    return ItemInteractionResult.SUCCESS;
+                }
+                var leftMaster = entity.findMasterAt(true);
+                if (leftMaster.getBlockState().getValue(FACING) == hitResult.getDirection()) {
+                    openEditor(leftMaster);
+                }
+            }
+            return ItemInteractionResult.SUCCESS;
         } else {
             //hit other sides
             if (hitResult.getDirection() != state.getValue(FACING)) {
