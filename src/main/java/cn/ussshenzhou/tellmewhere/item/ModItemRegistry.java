@@ -18,7 +18,7 @@ import java.util.function.Supplier;
 /**
  * @author USS_Shenzhou
  */
-@EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber
 public class ModItemRegistry {
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(BuiltInRegistries.ITEM, TellMeWhere.MODID);
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, TellMeWhere.MODID);

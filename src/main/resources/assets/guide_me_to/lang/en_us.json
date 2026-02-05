@@ -17,6 +17,24 @@
   "block.guide_me_to.sign_stick_thick_full": "Sign §o(stick thick wide)",
   "block.guide_me_to.sign_stick_thick_narrow": "Sign §o(stick thick narrow)",
 
+  "item.guide_me_to.sign_hang_thin": "Sign §o(hang, thin)",
+  "item.guide_me_to.sign_hang_thick": "Sign §o(hang, thick)",
+  "item.guide_me_to.sign_hang_thin_narrow": "Sign §o(hang thin narrow)",
+  "item.guide_me_to.sign_hang_thick_narrow": "Sign §o(hang thick narrow)",
+  "item.guide_me_to.sign_stand_thin": "Sign §o(stand, thin)",
+  "item.guide_me_to.sign_stand_thick": "Sign §o(stand, thick)",
+  "item.guide_me_to.sign_stand_thin_narrow": "Sign §o(stand thin narrow)",
+  "item.guide_me_to.sign_stand_thick_narrow": "Sign §o(stand thick narrow)",
+  "item.guide_me_to.sign_stick_thin": "Sign §o(stick thin)",
+  "item.guide_me_to.sign_stick_thin_full": "Sign §o(stick thin wide)",
+  "item.guide_me_to.sign_stick_thin_narrow": "Sign §o(stick thin narrow)",
+  "item.guide_me_to.sign_stick_thick": "Sign §o(stick thick)",
+  "item.guide_me_to.sign_stick_thick_full": "Sign §o(stick thick wide)",
+  "item.guide_me_to.sign_stick_thick_narrow": "Sign §o(stick thick narrow)",
+
   "block.guide_me_to.simple_pillar_thin": "Simple Pillar §o(thin)",
-  "block.guide_me_to.simple_pillar_thick": "Simple Pillar §o(thick)"
+  "block.guide_me_to.simple_pillar_thick": "Simple Pillar §o(thick)",
+
+  "item.guide_me_to.simple_pillar_thin": "Simple Pillar §o(thin)",
+  "item.guide_me_to.simple_pillar_thick": "Simple Pillar §o(thick)"
 }

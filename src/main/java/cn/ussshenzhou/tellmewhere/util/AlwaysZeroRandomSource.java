@@ -1,6 +1,6 @@
 package cn.ussshenzhou.tellmewhere.util;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
+import com.mojang.logging.annotations.MethodsReturnNonnullByDefault;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.levelgen.PositionalRandomFactory;
 

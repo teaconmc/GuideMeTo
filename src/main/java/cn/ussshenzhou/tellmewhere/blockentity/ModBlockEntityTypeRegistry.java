@@ -17,10 +17,10 @@ import java.util.function.Supplier;
 public class ModBlockEntityTypeRegistry {
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(BuiltInRegistries.BLOCK_ENTITY_TYPE, TellMeWhere.MODID);
 
-    public static final Supplier<BlockEntityType<SignBlockEntity>> TEST_SIGN = BLOCK_ENTITIES.register("sign", () -> BlockEntityType.Builder.of(
+    public static final Supplier<BlockEntityType<SignBlockEntity>> TEST_SIGN = BLOCK_ENTITIES.register("sign", () -> new BlockEntityType<>(
             SignBlockEntity::new,
             SignBlockAndItemRegistryHelper.SIGN_BLOCKS.values()
                     .stream().map(Supplier::get)
                     .toArray(Block[]::new)
-    ).build(DSL.remainderType()));
+    ));
 }

@@ -113,11 +113,6 @@ public class SignEditScreen extends TScreen {
     }
 
     @Override
-    protected void renderBackGround(GuiGraphics graphics, int pMouseX, int pMouseY, float pPartialTick) {
-        graphics.fill(0, 0, width, height, 0x80000000);
-    }
-
-    @Override
     public void setFocused(@Nullable GuiEventListener pListener) {
         if (pListener == imageSelector) {
             return;

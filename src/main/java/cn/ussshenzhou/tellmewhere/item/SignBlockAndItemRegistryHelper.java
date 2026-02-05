@@ -6,9 +6,11 @@ import cn.ussshenzhou.tellmewhere.block.BaseSignBlock;
 import cn.ussshenzhou.tellmewhere.blockentity.SignBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -17,6 +19,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -66,16 +69,21 @@ public class SignBlockAndItemRegistryHelper {
 
     @SuppressWarnings("NullableProblems")
     public static void registerBlock(DeferredRegister<Block> block) {
-        CONTEXTS.forEach(c -> SIGN_BLOCKS.put(c.name, block.register(c.name, () -> {
+        CONTEXTS.forEach(c -> SIGN_BLOCKS.put(c.name, block.register(c.name, name -> {
             if (c.name.startsWith("simple")) {
-                return new BaseSignBlock(new Vector3f(c.screenStart16X, c.screenStart16Y, c.screenStart16Z), c.defaultScreenLength16, c.screenHeight16, c.screenThick16, c.screenMargin16) {
+                return new BaseSignBlock(
+                        BlockBehaviour.Properties.of()
+                                .setId(ResourceKey.create(Registries.BLOCK, name))
+                                .noOcclusion()
+                                .strength(3, 6),
+                        new Vector3f(c.screenStart16X, c.screenStart16Y, c.screenStart16Z), c.defaultScreenLength16, c.screenHeight16, c.screenThick16, c.screenMargin16) {
                     @Override
-                    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+                    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
                         SignBlockEntity signBlockEntity = (SignBlockEntity) level.getBlockEntity(pos);
                         Item item = player.getItemInHand(hand).getItem();
                         var itemName = BuiltInRegistries.ITEM.getKey(item);
                         if (TellMeWhere.MODID.equals(itemName.getNamespace()) && itemName.getPath().contains("sign_")) {
-                            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+                            return InteractionResult.PASS;
                         }
                         if (!level.isClientSide() && item instanceof BlockItem blockItem) {
                             //itemInHand can place a block
@@ -89,10 +97,10 @@ public class SignBlockAndItemRegistryHelper {
                                     && signBlockEntity.getDisguiseBlockState().getBlock() != blockItem.getBlock()) {
                                 //block placed by itemInHand is a new block
                                 signBlockEntity.setDisguise(blockState);
-                                return ItemInteractionResult.SUCCESS;
+                                return InteractionResult.SUCCESS;
                             }
                         }
-                        return ItemInteractionResult.SUCCESS;
+                        return InteractionResult.SUCCESS;
                     }
 
                     @Override
@@ -102,7 +110,7 @@ public class SignBlockAndItemRegistryHelper {
 
                     @Override
                     public BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) {
-                        return new SignBlockEntity(pPos, pState, screenStart16, defaultScreenLength16, screenHeight16, screenThick16, screenMargin16){
+                        return new SignBlockEntity(pPos, pState, screenStart16, defaultScreenLength16, screenHeight16, screenThick16, screenMargin16) {
                             @Override
                             public void checkSlavesAt() {
                                 return;
@@ -111,12 +119,29 @@ public class SignBlockAndItemRegistryHelper {
                     }
                 };
             }
-            return new BaseSignBlock(new Vector3f(c.screenStart16X, c.screenStart16Y, c.screenStart16Z), c.defaultScreenLength16, c.screenHeight16, c.screenThick16, c.screenMargin16);
+            return new BaseSignBlock(
+                    BlockBehaviour.Properties.of()
+                            .setId(ResourceKey.create(Registries.BLOCK, name))
+                            .noOcclusion()
+                            .strength(3, 6),
+                    new Vector3f(c.screenStart16X, c.screenStart16Y, c.screenStart16Z), c.defaultScreenLength16, c.screenHeight16, c.screenThick16, c.screenMargin16);
         })));
     }
 
     public static void registerItem(DeferredRegister<Item> item) {
-        CONTEXTS.forEach(c -> SIGN_ITEMS.put(c.name, item.register(c.name, () -> new BlockItem(SIGN_BLOCKS.get(c.name).get(), new Item.Properties()))));
+        CONTEXTS.forEach(
+                c -> SIGN_ITEMS.put(
+                        c.name,
+                        item.register(
+                                c.name,
+                                () -> new BlockItem(
+                                        SIGN_BLOCKS.get(c.name).get(),
+                                        new Item.Properties()
+                                                .setId(ResourceKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(TellMeWhere.MODID, c.name())))
+                                )
+                        )
+                )
+        );
     }
 
     public record RegistryContext(

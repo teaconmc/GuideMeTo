@@ -5,16 +5,17 @@ import cn.ussshenzhou.tellmewhere.DirectionUtil;
 import cn.ussshenzhou.tellmewhere.TellMeWhere;
 import cn.ussshenzhou.tellmewhere.blockentity.SignBlockEntity;
 import cn.ussshenzhou.tellmewhere.gui.SignEditScreen;
+import com.mojang.logging.annotations.MethodsReturnNonnullByDefault;
 import com.mojang.math.Axis;
 import com.mojang.serialization.MapCodec;
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
@@ -26,7 +27,6 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.BaseEntityBlock;
-import net.minecraft.world.level.block.BeaconBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -36,8 +36,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -58,7 +56,7 @@ public class BaseSignBlock extends BaseEntityBlock {
     private final VoxelShape EAST;
     private final VoxelShape WEST;
 
-    public static final MapCodec<BaseSignBlock> CODEC = simpleCodec((Properties p) -> new BaseSignBlock(new Vector3f(), 0, 0, 0, 0));
+    public static final MapCodec<BaseSignBlock> CODEC = simpleCodec((Properties p) -> new BaseSignBlock(p, new Vector3f(), 0, 0, 0, 0));
 
     public final int defaultScreenLength16;
     public final Vector3f screenStart16;
@@ -67,11 +65,8 @@ public class BaseSignBlock extends BaseEntityBlock {
     public final int screenMargin16;
 
     @SuppressWarnings("AlibabaLowerCamelCaseVariableNaming")
-    public BaseSignBlock(Vector3f screenStart16, int defaultScreenLength16, int screenHeight16, int screenThick16, int screenMargin16) {
-        super(BlockBehaviour.Properties.of()
-                .noOcclusion()
-                .strength(3, 6)
-        );
+    public BaseSignBlock(BlockBehaviour.Properties properties, Vector3f screenStart16, int defaultScreenLength16, int screenHeight16, int screenThick16, int screenMargin16) {
+        super(properties);
         registerDefaultState(defaultBlockState()
                 .setValue(FACING, Direction.NORTH)
         );
@@ -106,8 +101,11 @@ public class BaseSignBlock extends BaseEntityBlock {
     @Override
     protected void spawnDestroyParticles(Level pLevel, Player pPlayer, BlockPos pPos, BlockState pState) {
         try {
-            super.spawnDestroyParticles(pLevel, pPlayer, pPos, ((SignBlockEntity) pLevel.getBlockEntity(pPos)).getDisguiseBlockState());
+            //noinspection DataFlowIssue
+            var disguiseBlockState = ((SignBlockEntity) pLevel.getBlockEntity(pPos)).getDisguiseBlockState();
+            super.spawnDestroyParticles(pLevel, pPlayer, pPos, disguiseBlockState);
         } catch (Exception ignored) {
+            super.spawnDestroyParticles(pLevel, pPlayer, pPos, pState);
         }
     }
 
@@ -159,30 +157,30 @@ public class BaseSignBlock extends BaseEntityBlock {
     }
 
     @Override
-    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         SignBlockEntity signBlockEntity = (SignBlockEntity) level.getBlockEntity(pos);
         Item item = player.getItemInHand(hand).getItem();
         var itemName = BuiltInRegistries.ITEM.getKey(item);
         if (TellMeWhere.MODID.equals(itemName.getNamespace()) && itemName.getPath().contains("sign_")) {
-            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            return InteractionResult.PASS;
         }
         if (level.isClientSide()) {
             var entity = (SignBlockEntity) player.level().getBlockEntity(pos);
             if (entity == null || Items.WOODEN_AXE.equals(player.getItemInHand(InteractionHand.MAIN_HAND).getItem())) {
-                return ItemInteractionResult.FAIL;
+                return InteractionResult.FAIL;
             }
             if (DirectionUtil.isParallel(hitResult.getDirection(), state.getValue(FACING))) {
                 var rightMaster = entity.findMasterAt(false);
                 if (rightMaster.getBlockState().getValue(FACING) == hitResult.getDirection()) {
                     openEditor(rightMaster);
-                    return ItemInteractionResult.SUCCESS;
+                    return InteractionResult.SUCCESS;
                 }
                 var leftMaster = entity.findMasterAt(true);
                 if (leftMaster.getBlockState().getValue(FACING) == hitResult.getDirection()) {
                     openEditor(leftMaster);
                 }
             }
-            return ItemInteractionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         } else {
             //hit other sides
             if (hitResult.getDirection() != state.getValue(FACING)) {
@@ -198,12 +196,12 @@ public class BaseSignBlock extends BaseEntityBlock {
                             && signBlockEntity.getDisguiseBlockState().getBlock() != blockItem.getBlock()) {
                         //block placed by itemInHand is a new block
                         signBlockEntity.setDisguise(blockState);
-                        return ItemInteractionResult.SUCCESS;
+                        return InteractionResult.SUCCESS;
                     }
                 }
             }
         }
-        return ItemInteractionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
     @Override
@@ -231,9 +229,14 @@ public class BaseSignBlock extends BaseEntityBlock {
         return InteractionResult.SUCCESS;
     }
 
-    @OnlyIn(Dist.CLIENT)
     private void openEditor(SignBlockEntity blockEntity) {
-        Minecraft.getInstance().setScreen(new SignEditScreen(blockEntity));
+        var opener = new Runnable() {
+            @Override
+            public void run() {
+                Minecraft.getInstance().setScreen(new SignEditScreen(blockEntity));
+            }
+        };
+        opener.run();
     }
 
     @Override

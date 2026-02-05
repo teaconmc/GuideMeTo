@@ -6,6 +6,7 @@ import cn.ussshenzhou.t88.gui.widegt.TPanel;
 import cn.ussshenzhou.t88.mixin.EditBoxAccessor;
 import cn.ussshenzhou.tellmewhere.SignText;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.input.MouseButtonEvent;
 
 import java.util.ArrayList;
 
@@ -19,16 +20,16 @@ public class SignContentPanel extends TPanel {
 
     protected TEditBox editBox = new TEditBox() {
         @Override
-        public boolean mouseClicked(double pMouseX, double pMouseY, int pButton) {
-            if (checkNeedToKeepFocused(pMouseX, pMouseY)) {
+        public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+            if (checkNeedToKeepFocused(event.x(), event.y())) {
                 return false;
             }
-            return super.mouseClicked(pMouseX, pMouseY, pButton);
+            return super.mouseClicked(event, doubleClick);
         }
 
         @Override
         protected void onClearEditBoxFocusEvent(ClearEditBoxFocusEvent event) {
-            if (checkNeedToKeepFocused(event.pMouseX, event.pMouseY)) {
+            if (checkNeedToKeepFocused(event.mouseX, event.mouseY)) {
                 return;
             }
             super.onClearEditBoxFocusEvent(event);
@@ -85,17 +86,15 @@ public class SignContentPanel extends TPanel {
     public void render(GuiGraphics graphics, int pMouseX, int pMouseY, float pPartialTick) {
         super.render(graphics, pMouseX, pMouseY, pPartialTick);
         var pose = graphics.pose();
-        var buffer = graphics.bufferSource();
-        pose.pushPose();
-        //TODO dynamic change
+        pose.pushMatrix();
         float scale = 2f;
-        pose.translate(this.getXT() + (this.width - totalLength * scale) / 2f, this.getYT() + (this.height - 24) / 2f, 0);
-        pose.scale(scale, scale, 0);
+        pose.translate(this.getXT() + (this.width - totalLength * scale) / 2f, this.getYT() + (this.height - 24) / 2f);
+        pose.scale(scale, scale);
         for (SignText.BakedText text : bakedTextList) {
-            text.render(pose, buffer, 0b11110000, null);
-            pose.translate(text.getLength(), 0, 0);
+            text.renderInGui(graphics);
+            pose.translate(text.getLength(), 0);
         }
-        pose.popPose();
+        pose.popMatrix();
     }
 
 }

@@ -1,7 +1,7 @@
 package cn.ussshenzhou.tellmewhere;
 
 import com.mojang.logging.LogUtils;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.LinkedHashMap;
 
@@ -166,7 +166,6 @@ public class ImageHelper {
         registerGoogle(450, "badge");
         registerGoogle(451, "mic");
         registerGoogle(452, "speed");
-        registerGoogle(453, "badge");
 
         registerImage(1000, "logo", CATEGORY_TEACON);
         registerImage(1001, "a", CATEGORY_TEACON);
@@ -221,12 +220,12 @@ public class ImageHelper {
             return this.index;
         }
 
-        public ResourceLocation getForRender() {
-            return ResourceLocation.fromNamespaceAndPath(TellMeWhere.MODID, "block/signs/" + category + "/" + name);
+        public Identifier getForRender() {
+            return Identifier.fromNamespaceAndPath(TellMeWhere.MODID, "block/signs/" + category + "/" + name);
         }
 
-        public ResourceLocation getForFile() {
-            return ResourceLocation.fromNamespaceAndPath(TellMeWhere.MODID, "textures/block/signs/" + category + "/" + name + ".png");
+        public Identifier getForFile() {
+            return Identifier.fromNamespaceAndPath(TellMeWhere.MODID, "textures/block/signs/" + category + "/" + name + ".png");
         }
     }
 }
