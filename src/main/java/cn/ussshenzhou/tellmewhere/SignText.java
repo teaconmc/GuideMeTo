@@ -152,7 +152,6 @@ public class SignText {
                 b.renderInWorld(poseStack, submitNodeCollector, packedLight, color);
                 poseStack.translate(b.length, 0, 0);
             }
-            poseStack.translate(0, 0, -0.001f);
         }
         poseStack.popPose();
     }
