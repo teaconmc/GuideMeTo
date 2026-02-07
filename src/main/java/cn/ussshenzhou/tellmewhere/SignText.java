@@ -7,13 +7,17 @@ import net.minecraft.client.gui.ActiveTextCollector;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.TextAlignment;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.util.FormattedCharSequence;
+import net.neoforged.fml.LogicalSide;
 import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.fml.util.thread.EffectiveSide;
 
 import java.util.*;
 
@@ -37,7 +41,7 @@ public class SignText {
     public SignText(Map<String, String> rawTexts) {
         this();
         this.rawTexts = rawTexts;
-        if (FMLEnvironment.getDist().isClient()) {
+        if (EffectiveSide.get().isClient()) {
             bakeTexts();
         }
     }
@@ -133,7 +137,7 @@ public class SignText {
         return list;
     }
 
-    public void renderInWorld(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int packedLight) {
+    public void renderInWorld(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int packedLight, int color) {
         poseStack.pushPose();
         poseStack.translate((usableWidth - usedWidth) / 2, 0, 0);
         poseStack.scale(totalCompressFactor, totalCompressFactor, 1);
@@ -141,34 +145,16 @@ public class SignText {
             if (b.type == BakedType.TEXT) {
                 poseStack.pushPose();
                 poseStack.scale(textHorizontalCompressFactor, 1, 1);
-                b.renderInWorld(poseStack, submitNodeCollector, packedLight);
+                b.renderInWorld(poseStack, submitNodeCollector, packedLight, color);
                 poseStack.popPose();
                 poseStack.translate(b.length * textHorizontalCompressFactor, 0, 0);
             } else {
-                b.renderInWorld(poseStack, submitNodeCollector, packedLight);
+                b.renderInWorld(poseStack, submitNodeCollector, packedLight, color);
                 poseStack.translate(b.length, 0, 0);
             }
+            poseStack.translate(0, 0, -0.001f);
         }
         poseStack.popPose();
-    }
-
-    public void renderInGui(GuiGraphics graphics) {
-        graphics.pose().pushMatrix();
-        graphics.pose().translate((usableWidth - usedWidth) / 2, 0);
-        graphics.pose().scale(totalCompressFactor, totalCompressFactor);
-        for (BakedText b : bakedTexts) {
-            if (b.type == BakedType.TEXT) {
-                graphics.pose().pushMatrix();
-                graphics.pose().scale(textHorizontalCompressFactor, 1);
-                b.renderInGui(graphics);
-                graphics.pose().popMatrix();
-                graphics.pose().translate(b.length * textHorizontalCompressFactor, 0);
-            } else {
-                b.renderInGui(graphics);
-                graphics.pose().translate(b.length, 0);
-            }
-        }
-        graphics.pose().popMatrix();
     }
 
     public static class BakedText {
@@ -201,39 +187,40 @@ public class SignText {
             }
         }
 
-        public void renderInWorld(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int packedLight) {
+        public void renderInWorld(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int packedLight, int color) {
             if (type == BakedType.TEXT) {
-                renderTextInWorld(poseStack, submitNodeCollector, packedLight);
+                renderTextInWorld(poseStack, submitNodeCollector, packedLight, color);
             } else if (type == BakedType.IMAGE) {
-                renderImageInWorld(poseStack, submitNodeCollector, packedLight);
+                renderImageInWorld(poseStack, submitNodeCollector, packedLight, color);
             }
         }
 
-        public void renderInGui(GuiGraphics graphics) {
+        public void renderInGui(GuiGraphics graphics, int foreground) {
             if (type == BakedType.TEXT) {
-                renderTextInGui(graphics);
+                renderTextInGui(graphics, foreground);
             } else if (type == BakedType.IMAGE) {
-                renderImageInGui(graphics);
+                renderImageInGui(graphics, foreground);
             }
         }
 
-        public void renderTextInWorld(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int packedLight) {
+        public void renderTextInWorld(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int packedLight, int color) {
             poseStack.pushPose();
             //0.5: to compensate shadow
             poseStack.translate(0, -4 + 0.5f, 0);
-            submitNodeCollector.submitText(poseStack, 0, 0, FormattedCharSequence.forward(text, STYLE), false, Font.DisplayMode.NORMAL, packedLight, 0xffffffff, 0, 0);
+            var c = Component.literal(text).setStyle(STYLE.withColor(color));
+            submitNodeCollector.submitText(poseStack, 0, 0, c.getVisualOrderText(), false, Font.DisplayMode.NORMAL, packedLight, color, 0, 0);
             poseStack.popPose();
         }
 
-        public void renderTextInGui(GuiGraphics graphics) {
+        public void renderTextInGui(GuiGraphics graphics, int foreground) {
             graphics.pose().pushMatrix();
             graphics.pose().translate(0, -4 + 0.5f);
-            graphics.textRenderer().accept(TextAlignment.LEFT, 0, 0, Component.literal(text).setStyle(STYLE));
+            graphics.textRenderer().accept(TextAlignment.LEFT, 0, 0, Component.literal(text).setStyle(STYLE.withColor(foreground)));
             graphics.pose().popMatrix();
         }
 
         @SuppressWarnings("deprecation")
-        public void renderImageInWorld(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int packedLight) {
+        public void renderImageInWorld(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int packedLight, int color) {
             poseStack.pushPose();
             float size = ImageHelper.IMAGE_SIZE / 2f;
             poseStack.translate(size, 0, 0);
@@ -242,16 +229,17 @@ public class SignText {
                 return;
             }
             var image = ((TextureAtlas) Minecraft.getInstance().getTextureManager().getTexture(TextureAtlas.LOCATION_BLOCKS)).getSprite(i.getForRender());
-            submitNodeCollector.submitCustomGeometry(poseStack, RenderTypes.translucentMovingBlock(), (pose, buffer) -> {
-                buffer.addVertex(pose, -size, -size, 0).setColor(255, 255, 255, 255).setUv(image.getU0(), image.getV0()).setLight(packedLight).setNormal(1, 0, 0);
-                buffer.addVertex(pose, -size, size, 0).setColor(255, 255, 255, 255).setUv(image.getU0(), image.getV1()).setLight(packedLight).setNormal(1, 0, 0);
-                buffer.addVertex(pose, size, size, 0).setColor(255, 255, 255, 255).setUv(image.getU1(), image.getV1()).setLight(packedLight).setNormal(1, 0, 0);
-                buffer.addVertex(pose, size, -size, 0).setColor(255, 255, 255, 255).setUv(image.getU1(), image.getV0()).setLight(packedLight).setNormal(1, 0, 0);
+            submitNodeCollector.submitCustomGeometry(poseStack, RenderTypes.cutoutMovingBlock(), (pose, buffer) -> {
+                var c = i.hasColor() ? -1 : color;
+                buffer.addVertex(pose, -size, -size, 0).setColor(c).setUv(image.getU0(), image.getV0()).setLight(packedLight).setNormal(1, 0, 0);
+                buffer.addVertex(pose, -size, size, 0).setColor(c).setUv(image.getU0(), image.getV1()).setLight(packedLight).setNormal(1, 0, 0);
+                buffer.addVertex(pose, size, size, 0).setColor(c).setUv(image.getU1(), image.getV1()).setLight(packedLight).setNormal(1, 0, 0);
+                buffer.addVertex(pose, size, -size, 0).setColor(c).setUv(image.getU1(), image.getV0()).setLight(packedLight).setNormal(1, 0, 0);
             });
             poseStack.popPose();
         }
 
-        public void renderImageInGui(GuiGraphics graphics) {
+        public void renderImageInGui(GuiGraphics graphics, int foreground) {
             graphics.pose().pushMatrix();
             int size = (int) (ImageHelper.IMAGE_SIZE / 2f);
             graphics.pose().translate(size, 0);
@@ -259,7 +247,7 @@ public class SignText {
             if (i == null) {
                 return;
             }
-            graphics.blit(i.getForFile(), -size, -size, size, size, 0, 1, 0, 1);
+            graphics.innerBlit(RenderPipelines.GUI_TEXTURED, i.getForFile(), -size, size, -size, size, 0, 1, 0, 1, i.hasColor() ? -1 : foreground);
             graphics.pose().popMatrix();
         }
 

@@ -1,6 +1,16 @@
 {
   "gui.tmw.editor.cancel": "取消",
   "gui.tmw.editor.done": "完成",
+  "gui.gmt.editor.meta": "设置",
+  "gui.gmt.editor.i18n": "+ 翻译",
+  "gui.gmt.editor.foreground": "前景色",
+  "gui.gmt.editor.background": "背景色",
+  "gui.gmt.editor.presets": "配色预设",
+  "gui.gmt.editor.presets.normal": "常规",
+  "gui.gmt.editor.presets.striking": "醒目",
+  "gui.gmt.editor.presets.attention": "警告",
+  "gui.gmt.editor.presets.forbid": "禁止",
+  "gui.gmt.editor.presets.reverse": "反色",
 
   "block.guide_me_to.sign_hang_thin": "标志牌 §o挂式 薄",
   "block.guide_me_to.sign_hang_thick": "标志牌 §o挂式 厚",

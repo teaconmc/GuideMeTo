@@ -31,7 +31,7 @@ public class SignBlockEntitySectionRenderer {
                 var pose = context.getPoseStack();
                 pose.pushPose();
                 pose.translate(blockPos.getX() - sectionOrigin.getX(), blockPos.getY() - sectionOrigin.getY(), blockPos.getZ() - sectionOrigin.getZ());
-                Minecraft.getInstance().getBlockRenderer().getModelRenderer().tesselateBlock(level, List.of(model), signBlockEntity.disguiseBlockState, blockPos, pose, context::getOrCreateChunkBuffer, false, OverlayTexture.NO_OVERLAY);
+                Minecraft.getInstance().getBlockRenderer().getModelRenderer().tesselateBlock(level, List.of(model), signBlockEntity.getDisguiseBlockState(), blockPos, pose, context::getOrCreateChunkBuffer, false, OverlayTexture.NO_OVERLAY);
                 pose.popPose();
             });
         });

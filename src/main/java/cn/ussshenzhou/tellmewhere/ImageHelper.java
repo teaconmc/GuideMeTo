@@ -34,7 +34,7 @@ public class ImageHelper {
         registerStd(11, "right_back");
         registerStd(12, "clockwise");
         registerStd(13, "counterclockwise");
-        registerStd(14, "exit");
+        registerStd(14, "exit", true);
         registerStd(15, "tickets");
         registerStd(16, "metro");
 
@@ -173,19 +173,31 @@ public class ImageHelper {
     }
 
     private static void registerStd(int index, String resourceName) {
-        registerImage(index, resourceName, CATEGORY_STD);
+        registerStd(index, resourceName, false);
     }
 
     private static void registerGoogle(int index, String resourceName) {
-        registerImage(index, resourceName, CATEGORY_GOOGLE);
+        registerGoogle(index, resourceName, false);
+    }
+
+    private static void registerStd(int index, String resourceName, boolean hasColor) {
+        registerImage(index, resourceName, CATEGORY_STD, hasColor);
+    }
+
+    private static void registerGoogle(int index, String resourceName, boolean hasColor) {
+        registerImage(index, resourceName, CATEGORY_GOOGLE, hasColor);
     }
 
     private static void registerImage(int index, String resourceName, String category) {
+        registerImage(index, resourceName, category, false);
+    }
+
+    private static void registerImage(int index, String resourceName, String category, boolean hasColor) {
         if (IMAGES.containsKey(index)) {
             LogUtils.getLogger().error("Conflict image index! Index {} of {} with category {} already exists. This should not happen.", index, resourceName, category);
             throw new RuntimeException();
         }
-        IMAGES.put(index, new ImageInfo(index, resourceName, category));
+        IMAGES.put(index, new ImageInfo(index, resourceName, category, hasColor));
     }
 
     public static int fromString(String rawText) {
@@ -206,7 +218,7 @@ public class ImageHelper {
         return IMAGES.get(index);
     }
 
-    public record ImageInfo(int index, String name, String category) {
+    public record ImageInfo(int index, String name, String category, boolean hasColor) {
         @Override
         public boolean equals(Object obj) {
             if (obj instanceof ImageInfo that) {

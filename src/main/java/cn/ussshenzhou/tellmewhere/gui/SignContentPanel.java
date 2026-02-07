@@ -85,13 +85,18 @@ public class SignContentPanel extends TPanel {
     @Override
     public void render(GuiGraphics graphics, int pMouseX, int pMouseY, float pPartialTick) {
         super.render(graphics, pMouseX, pMouseY, pPartialTick);
+        var screen = (SignEditScreen) this.getTopParentScreen();
+        var metaPanel = (MetaPanel) screen.multiLanguageContainer.getTabs().stream().filter(t -> t.getContent() instanceof MetaPanel).findFirst().get().getContent();
+        int fore = metaPanel.getForegroundColor();
+        int back = metaPanel.getBackgroundColor();
         var pose = graphics.pose();
         pose.pushMatrix();
         float scale = 2f;
         pose.translate(this.getXT() + (this.width - totalLength * scale) / 2f, this.getYT() + (this.height - 24) / 2f);
         pose.scale(scale, scale);
+        graphics.fill(0, -7, totalLength, 7, back);
         for (SignText.BakedText text : bakedTextList) {
-            text.renderInGui(graphics);
+            text.renderInGui(graphics, fore);
             pose.translate(text.getLength(), 0);
         }
         pose.popMatrix();

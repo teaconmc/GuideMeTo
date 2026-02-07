@@ -75,7 +75,8 @@ public class SignBlockAndItemRegistryHelper {
                         BlockBehaviour.Properties.of()
                                 .setId(ResourceKey.create(Registries.BLOCK, name))
                                 .noOcclusion()
-                                .strength(3, 6),
+                                .strength(3, 6)
+                                .lightLevel(_ -> 7),
                         new Vector3f(c.screenStart16X, c.screenStart16Y, c.screenStart16Z), c.defaultScreenLength16, c.screenHeight16, c.screenThick16, c.screenMargin16) {
                     @Override
                     protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
@@ -123,7 +124,8 @@ public class SignBlockAndItemRegistryHelper {
                     BlockBehaviour.Properties.of()
                             .setId(ResourceKey.create(Registries.BLOCK, name))
                             .noOcclusion()
-                            .strength(3, 6),
+                            .strength(3, 6)
+                            .lightLevel(_ -> 7),
                     new Vector3f(c.screenStart16X, c.screenStart16Y, c.screenStart16Z), c.defaultScreenLength16, c.screenHeight16, c.screenThick16, c.screenMargin16);
         })));
     }

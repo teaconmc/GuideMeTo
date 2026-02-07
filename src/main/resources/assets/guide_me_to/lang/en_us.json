@@ -1,6 +1,16 @@
 {
   "gui.tmw.editor.cancel": "Cancel",
   "gui.tmw.editor.done": "Done",
+  "gui.gmt.editor.meta": "Settings",
+  "gui.gmt.editor.i18n": "+ i18n",
+  "gui.gmt.editor.foreground": "Foreground Color",
+  "gui.gmt.editor.background": "Background Color",
+  "gui.gmt.editor.presets": "Presets",
+  "gui.gmt.editor.presets.normal": "Normal",
+  "gui.gmt.editor.presets.striking": "Striking",
+  "gui.gmt.editor.presets.attention": "Attention",
+  "gui.gmt.editor.presets.forbid": "Forbid",
+  "gui.gmt.editor.presets.reverse": "Reverse",
 
   "block.guide_me_to.sign_hang_thin": "Sign §o(hang, thin)",
   "block.guide_me_to.sign_hang_thick": "Sign §o(hang, thick)",

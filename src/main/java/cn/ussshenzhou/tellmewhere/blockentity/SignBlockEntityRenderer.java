@@ -15,9 +15,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.QuadCollection;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -42,7 +40,7 @@ public class SignBlockEntityRenderer implements BlockEntityRenderer<SignBlockEnt
 
     @Override
     public @NotNull AABB getRenderBoundingBox(SignBlockEntity blockEntity) {
-        var extra = blockEntity.getBlockState().getValue(BlockStateProperties.FACING).getCounterClockWise().normal.multiply(blockEntity.screenLength16 / 16);
+        var extra = blockEntity.getBlockState().getValue(BlockStateProperties.FACING).getCounterClockWise().normal.multiply(blockEntity.getScreenLength16() / 16);
         return BlockEntityRenderer.super.getRenderBoundingBox(blockEntity).expandTowards(extra.getX(), extra.getY(), extra.getZ());
     }
 
@@ -72,14 +70,14 @@ public class SignBlockEntityRenderer implements BlockEntityRenderer<SignBlockEnt
 
     private static void renderBackGround(SignBlockEntity thiz, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int packedLight) {
         poseStack.pushPose();
-        float x1 = -thiz.screenLength16 / 16f;
+        float x1 = -thiz.getScreenLength16() / 16f;
         float y1 = -thiz.screenHeight16 / 16f;
         poseStack.translate(0, 0, -0.01f);
         submitNodeCollector.submitCustomGeometry(poseStack, ModRenderTypes.BACKGROUND, (pose, buffer) -> {
-            buffer.addVertex(pose, 0, 0, 0).setColor(0, 0, 0, 255).setLight(packedLight);
-            buffer.addVertex(pose, 0, y1, 0).setColor(0, 0, 0, 255).setLight(packedLight);
-            buffer.addVertex(pose, x1, y1, 0).setColor(0, 0, 0, 255).setLight(packedLight);
-            buffer.addVertex(pose, x1, 0, 0).setColor(0, 0, 0, 255).setLight(packedLight);
+            buffer.addVertex(pose, 0, 0, 0).setColor(thiz.data.getBackgroundArgb()).setLight(packedLight);
+            buffer.addVertex(pose, 0, y1, 0).setColor(thiz.data.getBackgroundArgb()).setLight(packedLight);
+            buffer.addVertex(pose, x1, y1, 0).setColor(thiz.data.getBackgroundArgb()).setLight(packedLight);
+            buffer.addVertex(pose, x1, 0, 0).setColor(thiz.data.getBackgroundArgb()).setLight(packedLight);
         });
         poseStack.popPose();
     }
@@ -98,7 +96,7 @@ public class SignBlockEntityRenderer implements BlockEntityRenderer<SignBlockEnt
         poseStack.rotateAround(Axis.ZP.rotation((float) Math.PI), 0, 0, 0);
         poseStack.scale(1f / ImageHelper.IMAGE_SIZE, 1f / ImageHelper.IMAGE_SIZE, 0);
         poseStack.scale(thiz.screenHeight16 / 16f, thiz.screenHeight16 / 16f, 0);
-        thiz.signText.renderInWorld(poseStack, submitNodeCollector, 240);
+        thiz.getSignText().renderInWorld(poseStack, submitNodeCollector, packedLight, thiz.getData().getForegroundArgb());
         poseStack.popPose();
     }
 
@@ -196,7 +194,7 @@ public class SignBlockEntityRenderer implements BlockEntityRenderer<SignBlockEnt
 
 
     public static void calculateDisguiseModel(SignBlockEntity thiz) {
-        var blockModel = Minecraft.getInstance().getBlockRenderer().getBlockModel(thiz.disguiseBlockState);
+        var blockModel = Minecraft.getInstance().getBlockRenderer().getBlockModel(thiz.getDisguiseBlockState());
         List<BakedQuad> quadList = new ArrayList<>();
         Direction front = getFacing(thiz);
         handleQuads(thiz, blockModel, front, r -> handleFront(thiz, r), quadList);
@@ -223,6 +221,6 @@ public class SignBlockEntityRenderer implements BlockEntityRenderer<SignBlockEnt
 
 
     public static Direction getFacing(SignBlockEntity thiz) {
-        return BlockUtil.justGetFacing(thiz.disguiseBlockState, thiz.getBlockState());
+        return BlockUtil.justGetFacing(thiz.getDisguiseBlockState(), thiz.getBlockState());
     }
 }

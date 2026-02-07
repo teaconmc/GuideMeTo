@@ -35,13 +35,19 @@ public class SignEditScreen extends TScreen {
     protected final TLabelButton cancel = new TLabelButton(Component.translatable("gui.tmw.editor.cancel"), pButton -> onClose(true));
     protected final TLabelButton done = new TLabelButton(Component.translatable("gui.tmw.editor.done"), pButton -> {
         HashMap<String, String> map = new HashMap<>();
+        var packet = new EditSignPacket(null, null, 0, 0);
         multiLanguageContainer.getTabs().forEach(tab -> {
             if (tab.getContent() instanceof SignContentPanel panel) {
                 map.put(tab.getText().getString(), panel.editBox.getValue());
+            } else if (tab.getContent() instanceof MetaPanel metaPanel) {
+                packet.backgroundArgb = metaPanel.getBackgroundColor();
+                packet.foregroundArgb = metaPanel.getForegroundColor();
             }
         });
+        packet.pos = pos;
+        packet.languageAndText = map;
         map.put(Minecraft.getInstance().getLanguageManager().getSelected(), defaultPanel.editBox.getValue());
-        NetworkHelper.sendToServer(new EditSignPacket(pos, map));
+        NetworkHelper.sendToServer(packet);
         onClose(true);
     });
     protected final TTabPageContainer imageSelector = new TTabPageContainer();
@@ -55,6 +61,10 @@ public class SignEditScreen extends TScreen {
         this.add(defaultPanel);
         this.add(multiLanguageContainer);
         multiLanguageContainer.setBackground(0x80000000);
+        multiLanguageContainer.newTab(Component.translatable("gui.gmt.editor.meta"), new MetaPanel(
+                blockEntity.data.getForegroundArgb() & 0xffffff,
+                blockEntity.data.getBackgroundArgb() & 0xffffff
+        )).setCloseable(false);
         this.add(cancel);
         this.add(done);
         this.add(imageSelector);
@@ -69,7 +79,7 @@ public class SignEditScreen extends TScreen {
             }
             multiLanguageContainer.newTab(Component.literal(language), new SignContentPanel(raw));
         });
-        multiLanguageContainer.newTab(Component.literal("+"), new NewLanguagePanel()).setCloseable(false).setKeepFinal(true);
+        multiLanguageContainer.newTab(Component.translatable("gui.gmt.editor.i18n"), new NewLanguagePanel()).setCloseable(false).setKeepFinal(true);
         multiLanguageContainer.selectTab(0);
     }
 
