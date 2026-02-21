@@ -41,6 +41,10 @@ public class SignBlockEntity extends BlockEntity {
     public int screenMargin16;
     //public final int textMargin = 0;
 
+    /**
+     * Highly dangerous but working.
+     * @see <a href="https://holojaneway.uss-shenzhou.cn/holojaneway/0.2#onlyin%E4%BD%86%E6%98%AF%E4%B8%BA%E4%BB%80%E4%B9%88">HoloJaneway</a>
+     */
     protected SingleVariant disguiseModel;
 
     public SignBlockEntity(BlockPos pPos, BlockState pBlockState) {

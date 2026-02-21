@@ -4,6 +4,7 @@ import cn.ussshenzhou.t88.util.BlockUtil;
 import cn.ussshenzhou.t88.util.RawQuad;
 import cn.ussshenzhou.t88.util.RenderUtil;
 import cn.ussshenzhou.tellmewhere.ImageHelper;
+import cn.ussshenzhou.tellmewhere.block.PillarBlock;
 import cn.ussshenzhou.tellmewhere.util.AlwaysZeroRandomSource;
 import cn.ussshenzhou.tellmewhere.util.ModRenderTypes;
 import com.mojang.blaze3d.vertex.*;
@@ -57,6 +58,10 @@ public class SignBlockEntityRenderer implements BlockEntityRenderer<SignBlockEnt
 
     @Override
     public void submit(SignBlockEntityRenderState signBlockEntityRenderState, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState) {
+        var block = signBlockEntityRenderState.blockState.getBlock();
+        if (block instanceof PillarBlock) {
+            return;
+        }
         var sign = signBlockEntityRenderState.blockEntity;
         var packedLight = RenderUtil.getPackedLight(sign.getLight(), signBlockEntityRenderState.lightCoords);
         if (sign.isMaster()) {

@@ -1,9 +1,9 @@
 package cn.ussshenzhou.tellmewhere.blockentity;
 
 import cn.ussshenzhou.tellmewhere.SignText;
+import cn.ussshenzhou.tellmewhere.block.ModBlocks;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
 /**
@@ -22,7 +22,7 @@ public class SignBlockData {
     ).apply(ins, SignBlockData::new));
 
     private short light = 15;
-    private BlockState disguiseBlockState = Blocks.AIR.defaultBlockState();
+    private BlockState disguiseBlockState = ModBlocks.MISSING.get().defaultBlockState();
     private boolean slave = false;
     private int screenLength16;
     private SignText signText = new SignText();

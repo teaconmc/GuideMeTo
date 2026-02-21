@@ -159,7 +159,7 @@ public class BaseSignBlock extends BaseEntityBlock {
         SignBlockEntity signBlockEntity = (SignBlockEntity) level.getBlockEntity(pos);
         Item item = player.getItemInHand(hand).getItem();
         var itemName = BuiltInRegistries.ITEM.getKey(item);
-        if (TellMeWhere.MODID.equals(itemName.getNamespace()) && itemName.getPath().contains("sign_")) {
+        if (TellMeWhere.MODID.equals(itemName.getNamespace()) && (itemName.getPath().contains("sign_") || itemName.getPath().contains("pillar_"))) {
             return InteractionResult.PASS;
         }
         if (level.isClientSide()) {
@@ -241,4 +241,6 @@ public class BaseSignBlock extends BaseEntityBlock {
     protected MapCodec<? extends BaseEntityBlock> codec() {
         return CODEC;
     }
+
+
 }
