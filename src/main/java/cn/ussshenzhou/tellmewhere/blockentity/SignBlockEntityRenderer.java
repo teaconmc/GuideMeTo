@@ -11,13 +11,20 @@ import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
+import net.minecraft.client.renderer.block.dispatch.SingleVariant;
 import net.minecraft.client.renderer.block.model.*;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
-import net.minecraft.client.renderer.state.CameraRenderState;
-import net.minecraft.client.resources.model.QuadCollection;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.client.resources.model.SimpleModelWrapper;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
+import net.minecraft.client.resources.model.geometry.QuadCollection;
+import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.AABB;
@@ -188,7 +195,9 @@ public class SignBlockEntityRenderer implements BlockEntityRenderer<SignBlockEnt
 
 
     protected static void handleQuads(SignBlockEntity thiz, BlockStateModel blockModel, Direction d, Consumer<RawQuad> directionalHandler, List<BakedQuad> quadList) {
-        for (var p : blockModel.collectParts(thiz.getLevel(), thiz.getBlockPos(), thiz.getDisguiseBlockState(), new AlwaysZeroRandomSource())) {
+        var list = new ArrayList<BlockStateModelPart>();
+        blockModel.collectParts((BlockAndTintGetter) thiz.getLevel(), thiz.getBlockPos(), thiz.getDisguiseBlockState(), new AlwaysZeroRandomSource(), list);
+        for (var p : list) {
             for (var b : p.getQuads(d)) {
                 RawQuad r = new RawQuad(b);
                 directionalHandler.accept(r);
@@ -199,7 +208,7 @@ public class SignBlockEntityRenderer implements BlockEntityRenderer<SignBlockEnt
 
 
     public static void calculateDisguiseModel(SignBlockEntity thiz) {
-        var blockModel = Minecraft.getInstance().getBlockRenderer().getBlockModel(thiz.getDisguiseBlockState());
+        var blockModel = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(thiz.getDisguiseBlockState());
         List<BakedQuad> quadList = new ArrayList<>();
         Direction front = getFacing(thiz);
         handleQuads(thiz, blockModel, front, r -> handleFront(thiz, r), quadList);
@@ -218,7 +227,7 @@ public class SignBlockEntityRenderer implements BlockEntityRenderer<SignBlockEnt
             return;
         }
         var quad = quadList.getFirst();
-        thiz.disguiseModel = new SingleVariant(new SimpleModelWrapper(modelBuilder.build(), quad.hasAmbientOcclusion(), quad.sprite(), ChunkSectionLayer.TRANSLUCENT));
+        thiz.disguiseModel = new SingleVariant(new SimpleModelWrapper(modelBuilder.build(), quad.materialInfo().ambientOcclusion(), new Material.Baked(quad.materialInfo().sprite(), true)));
         if (thiz.getLevel() != null) {
             thiz.getLevel().setBlocksDirty(thiz.getBlockPos(), thiz.getBlockState(), thiz.getBlockState());
         }

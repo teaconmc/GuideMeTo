@@ -11,7 +11,7 @@ import cn.ussshenzhou.tellmewhere.blockentity.SignBlockEntity;
 import cn.ussshenzhou.tellmewhere.network.EditSignPacket;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;

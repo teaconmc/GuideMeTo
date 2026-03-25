@@ -1,8 +1,8 @@
 {
   "parent": "block/block",
   "textures": {
-    "particle": "missingno",
-    "t": "missingno"
+    "particle": "guide_me_to:block/missingno",
+    "t": "guide_me_to:block/missingno"
   },
   "elements": [
     {

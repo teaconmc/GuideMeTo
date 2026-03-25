@@ -5,7 +5,7 @@ import com.mojang.serialization.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ActiveTextCollector;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.TextAlignment;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.SubmitNodeCollector;
@@ -194,7 +194,7 @@ public class SignText {
             }
         }
 
-        public void renderInGui(GuiGraphics graphics, int foreground) {
+        public void renderInGui(GuiGraphicsExtractor graphics, int foreground) {
             if (type == BakedType.TEXT) {
                 renderTextInGui(graphics, foreground);
             } else if (type == BakedType.IMAGE) {
@@ -211,7 +211,7 @@ public class SignText {
             poseStack.popPose();
         }
 
-        public void renderTextInGui(GuiGraphics graphics, int foreground) {
+        public void renderTextInGui(GuiGraphicsExtractor graphics, int foreground) {
             graphics.pose().pushMatrix();
             graphics.pose().translate(0, -4 + 0.5f);
             graphics.textRenderer().accept(TextAlignment.LEFT, 0, 0, Component.literal(text).setStyle(STYLE.withColor(foreground)));
@@ -238,7 +238,7 @@ public class SignText {
             poseStack.popPose();
         }
 
-        public void renderImageInGui(GuiGraphics graphics, int foreground) {
+        public void renderImageInGui(GuiGraphicsExtractor graphics, int foreground) {
             graphics.pose().pushMatrix();
             int size = (int) (ImageHelper.IMAGE_SIZE / 2f);
             graphics.pose().translate(size, 0);

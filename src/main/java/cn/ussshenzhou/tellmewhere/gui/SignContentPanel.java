@@ -5,7 +5,7 @@ import cn.ussshenzhou.t88.gui.widegt.TEditBox;
 import cn.ussshenzhou.t88.gui.widegt.TPanel;
 import cn.ussshenzhou.t88.mixin.EditBoxAccessor;
 import cn.ussshenzhou.tellmewhere.SignText;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.input.MouseButtonEvent;
 
 import java.util.ArrayList;
@@ -83,8 +83,8 @@ public class SignContentPanel extends TPanel {
     }
 
     @Override
-    public void render(GuiGraphics graphics, int pMouseX, int pMouseY, float pPartialTick) {
-        super.render(graphics, pMouseX, pMouseY, pPartialTick);
+    public void extractRenderState(GuiGraphicsExtractor graphics, int pMouseX, int pMouseY, float pPartialTick) {
+        super.extractRenderState(graphics, pMouseX, pMouseY, pPartialTick);
         var screen = (SignEditScreen) this.getTopParentScreen();
         var metaPanel = (MetaPanel) screen.multiLanguageContainer.getTabs().stream().filter(t -> t.getContent() instanceof MetaPanel).findFirst().get().getContent();
         int fore = metaPanel.getForegroundColor();

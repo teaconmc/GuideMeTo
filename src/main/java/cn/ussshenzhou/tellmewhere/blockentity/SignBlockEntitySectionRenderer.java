@@ -1,7 +1,12 @@
 package cn.ussshenzhou.tellmewhere.blockentity;
 
+import com.mojang.blaze3d.vertex.QuadInstance;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
+import net.minecraft.client.renderer.block.BlockQuadOutput;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.core.SectionPos;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -27,11 +32,13 @@ public class SignBlockEntitySectionRenderer {
                 return;
             }
             event.addRenderer(context -> {
-                var model = signBlockEntity.disguiseModel.model;
                 var pose = context.getPoseStack();
                 pose.pushPose();
-                pose.translate(blockPos.getX() - sectionOrigin.getX(), blockPos.getY() - sectionOrigin.getY(), blockPos.getZ() - sectionOrigin.getZ());
-                Minecraft.getInstance().getBlockRenderer().getModelRenderer().tesselateBlock(level, List.of(model), signBlockEntity.getDisguiseBlockState(), blockPos, pose, context::getOrCreateChunkBuffer, false, OverlayTexture.NO_OVERLAY);
+                //pose.translate(blockPos.getX() - sectionOrigin.getX(), blockPos.getY() - sectionOrigin.getY(), blockPos.getZ() - sectionOrigin.getZ());
+                //context.getBlockRenderer().tesselateBlock(level, List.of(model), signBlockEntity.getDisguiseBlockState(), blockPos, pose, context::getOrCreateChunkBuffer, false, OverlayTexture.NO_OVERLAY);
+                context.getBlockRenderer().tesselateBlock((x, y, z, quad, instance) -> context.getOrCreateChunkBuffer(ChunkSectionLayer.TRANSLUCENT).putBlockBakedQuad(x, y, z, quad, instance),
+                        blockPos.getX() - sectionOrigin.getX(), blockPos.getY() - sectionOrigin.getY(), blockPos.getZ() - sectionOrigin.getZ(),
+                        (BlockAndTintGetter) level, blockPos, signBlockEntity.getDisguiseBlockState(), signBlockEntity.disguiseModel, 42);
                 pose.popPose();
             });
         });

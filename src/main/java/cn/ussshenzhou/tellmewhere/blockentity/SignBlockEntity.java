@@ -4,7 +4,7 @@ import cn.ussshenzhou.tellmewhere.DirectionUtil;
 import cn.ussshenzhou.tellmewhere.SignText;
 import cn.ussshenzhou.tellmewhere.block.BaseSignBlock;
 import com.mojang.logging.annotations.MethodsReturnNonnullByDefault;
-import net.minecraft.client.renderer.block.model.SingleVariant;
+import net.minecraft.client.renderer.block.dispatch.SingleVariant;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;

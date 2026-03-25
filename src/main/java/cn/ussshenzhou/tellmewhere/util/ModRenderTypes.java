@@ -1,6 +1,7 @@
 package cn.ussshenzhou.tellmewhere.util;
 
 import cn.ussshenzhou.tellmewhere.TellMeWhere;
+import com.mojang.blaze3d.pipeline.DepthStencilState;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
@@ -22,7 +23,7 @@ public class ModRenderTypes {
             .withVertexShader("core/position_color")
             .withFragmentShader("core/position_color")
             //.withBlend(BlendFunction.TRANSLUCENT)
-            .withDepthWrite(true)
+            .withDepthStencilState(DepthStencilState.DEFAULT)
             .withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS)
             .withLocation(Identifier.fromNamespaceAndPath(TellMeWhere.MODID, "background"))
             .withCull(true)
