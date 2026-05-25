@@ -144,13 +144,35 @@ neoForge.ideSyncTask generateModMetadata
 // Example configuration to allow publishing using the maven-publish plugin
 publishing {
     publications {
-        register('mavenJava', MavenPublication) {
-            from components.java
+        release(MavenPublication) {
+            groupId = "cn.uss-shenzhou"
+            artifactId = "guide_me_to"
+
+            artifact jar
+            pom {
+                name = mod_name
+                description = mod_description
+                url = 'https://github.com/teaconmc/GuideMeTo'
+                issueManagement {
+                    system = 'GitHub Issues'
+                    url = 'https://github.com/teaconmc/GuideMeTo'
+                }
+                scm {
+                    url = 'https://github.com/teaconmc/GuideMeTo'
+                    connection = 'scm:git:git://github.com/teaconmc/GuideMeTo.git'
+                    developerConnection = 'scm:git:git@github.com:teaconmc/GuideMeTo.git'
+                }
+            }
         }
     }
     repositories {
         maven {
-            url "file://${project.projectDir}/repo"
+            name = "teacon"
+            url = "s3://maven/"
+            credentials(AwsCredentials) {
+                accessKey = System.env.ARCHIVE_ACCESS_KEY
+                secretKey = System.env.ARCHIVE_SECRET_KEY
+            }
         }
     }
 }
