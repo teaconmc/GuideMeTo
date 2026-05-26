@@ -32,14 +32,9 @@ public class SignBlockEntitySectionRenderer {
                 return;
             }
             event.addRenderer(context -> {
-                var pose = context.getPoseStack();
-                pose.pushPose();
-                //pose.translate(blockPos.getX() - sectionOrigin.getX(), blockPos.getY() - sectionOrigin.getY(), blockPos.getZ() - sectionOrigin.getZ());
-                //context.getBlockRenderer().tesselateBlock(level, List.of(model), signBlockEntity.getDisguiseBlockState(), blockPos, pose, context::getOrCreateChunkBuffer, false, OverlayTexture.NO_OVERLAY);
                 context.getBlockRenderer().tesselateBlock((x, y, z, quad, instance) -> context.getOrCreateChunkBuffer(ChunkSectionLayer.TRANSLUCENT).putBlockBakedQuad(x, y, z, quad, instance),
                         blockPos.getX() - sectionOrigin.getX(), blockPos.getY() - sectionOrigin.getY(), blockPos.getZ() - sectionOrigin.getZ(),
                         (BlockAndTintGetter) level, blockPos, signBlockEntity.getDisguiseBlockState(), signBlockEntity.disguiseModel, 42);
-                pose.popPose();
             });
         });
     }
