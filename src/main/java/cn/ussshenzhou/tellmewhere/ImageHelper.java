@@ -15,6 +15,7 @@ public class ImageHelper {
     private static final String CATEGORY_GOOGLE = "google";
     //-----TeaCon-----
     private static final String CATEGORY_TEACON = "teacon";
+    private static final String CATEGORY_TEACON_2026 = "teacon2026";
 
     public static final LinkedHashMap<Integer, ImageInfo> IMAGES = new LinkedHashMap<>();
 
@@ -172,6 +173,17 @@ public class ImageHelper {
         registerImage(1000, "logo", CATEGORY_TEACON);
         registerImage(1001, "a", CATEGORY_TEACON);
         registerImage(1002, "b", CATEGORY_TEACON);
+
+        registerImage(1050, "zone-ka-1", CATEGORY_TEACON_2026, true);
+        registerImage(1051, "zone-ka-2", CATEGORY_TEACON_2026, true);
+        registerImage(1052, "zone-bc-1", CATEGORY_TEACON_2026, true);
+        registerImage(1053, "zone-bc-2", CATEGORY_TEACON_2026, true);
+        registerImage(1054, "zone-de-1", CATEGORY_TEACON_2026, true);
+        registerImage(1055, "zone-de-2", CATEGORY_TEACON_2026, true);
+        registerImage(1056, "zone-fg-1", CATEGORY_TEACON_2026, true);
+        registerImage(1057, "zone-fg-2", CATEGORY_TEACON_2026, true);
+        registerImage(1058, "zone-hj-1", CATEGORY_TEACON_2026, true);
+        registerImage(1059, "zone-hj-2", CATEGORY_TEACON_2026, true);
     }
 
     private static void registerStd(int index, String resourceName) {
